@@ -72,6 +72,10 @@
             background-color: #FEF3C7; /* Jasnożółty */
             border-color: #FBBF24; /* Ciemniejszy żółty */
         }
+        .filter-link.active {
+            background-color: #ff5a00;
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -88,8 +92,7 @@
                 <a href="#" id="register-btn" class="bg-brand-orange text-white font-semibold px-4 py-2 rounded-lg hover:bg-opacity-90 transition">Zarejestruj się</a>
             </div>
             <div id="user-actions-logged-in" class="hidden items-center space-x-4">
-                 <span id="welcome-message" class="text-gray-700 font-medium"></span>
-                 <a href="#" id="logout-btn" class="bg-gray-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-700 transition">Wyloguj</a>
+                 <!-- Panel użytkownika będzie wstrzykiwany tutaj -->
             </div>
         </div>
     </header>
@@ -99,7 +102,8 @@
             <a data-category="czesci-samochodowe" class="text-white px-4 py-2 cursor-pointer rounded">Części samochodowe</a>
             <a data-category="artykuly-spozywcze" class="text-white px-4 py-2 cursor-pointer rounded">Artykuły spożywcze</a>
             <a data-category="alkohol" class="text-white px-4 py-2 cursor-pointer rounded">Alkohol</a>
-            <a data-category="oferty-pracy" class="text-white px-4 py-2 cursor-pointer rounded">Oferty pracy za granicą</a>
+            <a data-category="oferty-pracy" id="job-offers-link" class="text-white px-4 py-2 cursor-pointer rounded">Oferty pracy za granicą</a>
+            <a data-category="cyberbezpieczenstwo" class="text-white px-4 py-2 cursor-pointer rounded">Cyberbezpieczeństwo</a>
         </div>
     </nav>
 
@@ -132,24 +136,27 @@
         // --- SYMULACJA BAZY DANYCH I STANU UŻYTKOWNIKA ---
         const db = {
             sellers: {
-                // Sprzedawcy części samochodowych
                 'auto-czesci-krakow': { name: 'AutoCzesci-Krakow', rating: 4.9, image: 'https://placehold.co/100x100/333/fff?text=A-K' },
                 'moto-sklep': { name: 'Moto-Sklep', rating: 4.8, image: 'https://placehold.co/100x100/555/fff?text=M-S' },
                 'garaz-majstra': { name: 'Garaż Majstra', rating: 4.6, image: 'https://placehold.co/100x100/777/fff?text=G-M' },
-                // Sprzedawcy artykułów spożywczych
                 'piekarnia-zloty-klos': { name: 'Piekarnia Złoty Kłos', rating: 4.9, image: 'https://placehold.co/100x100/c68a3e/fff?text=Piek' },
                 'lokalna-mleczarnia': { name: 'Lokalna Mleczarnia', rating: 4.7, image: 'https://placehold.co/100x100/e6f2ff/000?text=Mlek' },
                 'sadownik-jan': { name: 'Sadownik Jan', rating: 4.8, image: 'https://placehold.co/100x100/d92121/fff?text=Sad' },
-                // Sprzedawcy alkoholu
                 'browar-rzemieslnik': { name: 'Browar Rzemieślnik', rating: 4.9, image: 'https://placehold.co/100x100/f4b74a/000?text=BR' },
                 'pinta': { name: 'PINTA', rating: 4.8, image: 'https://placehold.co/100x100/1a1a1a/fff?text=Pinta' },
-                'lokalne-piwko': { name: 'Lokalne Piwko', rating: 4.5, image: 'https://placehold.co/100x100/3c2f2f/fff?text=LP' }
+                'lokalne-piwko': { name: 'Lokalne Piwko', rating: 4.5, image: 'https://placehold.co/100x100/3c2f2f/fff?text=LP' },
+                'bau-meister-gmbh': { name: 'BauMeister GmbH', rating: 4.9, image: 'https://placehold.co/100x100/ffc107/000?text=Bau' },
+                'care-pro-nl': { name: 'CarePro NL', rating: 4.8, image: 'https://placehold.co/100x100/28a745/fff?text=Care' },
+                'cyber-secure': { name: 'CyberSecure Solutions', rating: 4.9, image: 'https://placehold.co/100x100/0d47a1/fff?text=CSS' },
+                'secure-net': { name: 'SecureNet Experts', rating: 4.8, image: 'https://placehold.co/100x100/00695c/fff?text=SNE' },
+                'data-protect': { name: 'DataProtect Inc.', rating: 4.7, image: 'https://placehold.co/100x100/4a148c/fff?text=DPI' }
             },
             'czesci-samochodowe': [
-                { id: 1, name: 'Opony letnie Michelin Pilot Sport 4', price: '450,00 zł', sellerId: 'auto-czesci-krakow', image: 'https://placehold.co/400x400/333/fff?text=Opony' },
-                { id: 2, name: 'Klocki hamulcowe Brembo', price: '280,00 zł', sellerId: 'moto-sklep', image: 'https://placehold.co/400x400/555/fff?text=Klocki' },
-                { id: 7, name: 'Olej silnikowy Castrol EDGE 5W-30', price: '150,00 zł', sellerId: 'auto-czesci-krakow', image: 'https://placehold.co/400x400/999/fff?text=Olej' },
-                { id: 8, name: 'Wycieraczki Bosch Aerotwin', price: '85,00 zł', sellerId: 'garaz-majstra', image: 'https://placehold.co/400x400/111/fff?text=Wycieraczki' }
+                { id: 1, name: 'Opony letnie Michelin Pilot Sport 4', price: '450,00 zł', sellerId: 'auto-czesci-krakow', image: 'https://placehold.co/400x400/333/fff?text=Opony', subCategory: 'Opony i felgi', manufacturer: 'Michelin', condition: 'Nowe' },
+                { id: 2, name: 'Klocki hamulcowe Brembo', price: '280,00 zł', sellerId: 'moto-sklep', image: 'https://placehold.co/400x400/555/fff?text=Klocki', subCategory: 'Układ hamulcowy', manufacturer: 'Brembo', condition: 'Nowe' },
+                { id: 7, name: 'Olej silnikowy Castrol EDGE 5W-30', price: '150,00 zł', sellerId: 'auto-czesci-krakow', image: 'https://placehold.co/400x400/999/fff?text=Olej', subCategory: 'Filtry i oleje', manufacturer: 'Castrol', condition: 'Nowe' },
+                { id: 8, name: 'Wycieraczki Bosch Aerotwin', price: '85,00 zł', sellerId: 'garaz-majstra', image: 'https://placehold.co/400x400/111/fff?text=Wycieraczki', subCategory: 'Części karoserii', manufacturer: 'Bosch', condition: 'Nowe' },
+                { id: 15, name: 'Używany alternator Valeo', price: '250,00 zł', sellerId: 'garaz-majstra', image: 'https://placehold.co/400x400/444/fff?text=Alternator', subCategory: 'Elektryka', manufacturer: 'Valeo', condition: 'Używane' }
             ],
             'artykuly-spozywcze': [
                 { id: 3, name: 'Chleb wiejski na zakwasie', price: '8,50 zł', sellerId: 'piekarnia-zloty-klos', image: 'https://placehold.co/400x400/c68a3e/fff?text=Chleb' },
@@ -164,13 +171,21 @@
                 { id: 14, name: 'Jasne Pełne Regionalne', price: '8,00 zł', sellerId: 'lokalne-piwko', image: 'https://placehold.co/400x400/f9d71c/000?text=Jasne' }
             ],
             'oferty-pracy': [
-                { id: 5, name: 'Pracownik budowlany', price: '18 EUR/h', seller: 'BauMeister GmbH', location: 'Berlin, Niemcy', description: 'Poszukujemy doświadczonych pracowników budowlanych do pracy przy wznoszeniu budynków mieszkalnych. Wymagane doświadczenie.' },
-                { id: 6, name: 'Opiekunka osób starszych', price: '2500 EUR/miesiąc', seller: 'CarePro NL', location: 'Amsterdam, Holandia', description: 'Praca z zamieszkaniem. Wymagana znajomość języka angielskiego lub niderlandzkiego w stopniu komunikatywnym.' }
+                { id: 5, name: 'Pracownik budowlany', price: '18 EUR/h', sellerId: 'bau-meister-gmbh', location: 'Berlin, Niemcy', description: 'Poszukujemy doświadczonych pracowników budowlanych do pracy przy wznoszeniu budynków mieszkalnych. Wymagane doświadczenie.' },
+                { id: 6, name: 'Opiekunka osób starszych', price: '2500 EUR/miesiąc', sellerId: 'care-pro-nl', location: 'Amsterdam, Holandia', description: 'Praca z zamieszkaniem. Wymagana znajomość języka angielskiego lub niderlandzkiego w stopniu komunikatywnym.' }
+            ],
+            'cyberbezpieczenstwo': [
+                { id: 16, name: 'Pentester (Specjalista ds. Testów Penetracyjnych)', price: '15 000 - 20 000 PLN', sellerId: 'cyber-secure', location: 'Warszawa (Zdalnie)', description: 'Poszukujemy doświadczonego pentestera do przeprowadzania testów bezpieczeństwa aplikacji webowych i mobilnych.' },
+                { id: 17, name: 'Analityk Bezpieczeństwa IT', price: '12 000 - 16 000 PLN', sellerId: 'secure-net', location: 'Kraków', description: 'Analiza i reagowanie na incydenty bezpieczeństwa, monitorowanie systemów SIEM.' },
+                { id: 18, name: 'Specjalista SOC', price: '10 000 - 14 000 PLN', sellerId: 'data-protect', location: 'Wrocław', description: 'Praca w Security Operations Center, analiza logów i alertów bezpieczeństwa.' },
+                { id: 19, name: 'Konsultant ds. Cyberbezpieczeństwa', price: '18 000 - 25 000 PLN', sellerId: 'cyber-secure', location: 'Praca zdalna', description: 'Doradztwo w zakresie strategii bezpieczeństwa, audyty i wdrażanie standardów ISO 27001.' },
+                { id: 20, name: 'Inżynier Bezpieczeństwa Sieciowego', price: '14 000 - 19 000 PLN', sellerId: 'secure-net', location: 'Gdańsk', description: 'Konfiguracja i zarządzanie urządzeniami sieciowymi (firewalle, IPS/IDS).' },
+                { id: 21, name: 'Incident Responder', price: '16 000 - 22 000 PLN', sellerId: 'cyber-secure', location: 'Warszawa', description: 'Zarządzanie incydentami bezpieczeństwa, od wykrycia po usunięcie skutków ataku.' }
             ]
         };
 
         let state = {
-            currentUser: null, // np. { name: 'Jan', type: 'employee' }
+            currentUser: null,
             currentCategory: null,
         };
 
@@ -182,10 +197,25 @@
         const modalContainer = document.getElementById('modal-container');
         const loggedOutView = document.getElementById('user-actions-logged-out');
         const loggedInView = document.getElementById('user-actions-logged-in');
-        const welcomeMessage = document.getElementById('welcome-message');
 
         // --- SZABLONY HTML (WIDOKI) ---
         const views = {
+            loginChoice: `
+                <div class="p-8 text-center">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Witaj w Job&TradeApp!</h2>
+                    <p class="text-gray-600 mb-8">Wybierz, w jakiej roli chcesz się zalogować.</p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button data-type="employee" class="login-choice-btn flex-1 bg-blue-500 text-white p-6 rounded-lg text-left hover:bg-blue-600 transition">
+                            <h3 class="text-xl font-bold">Szukam / Znajdź pracę</h3>
+                            <p class="mt-1 text-blue-100">Przeglądaj oferty pracy i aplikuj.</p>
+                        </button>
+                        <button data-type="seller" class="login-choice-btn flex-1 bg-green-500 text-white p-6 rounded-lg text-left hover:bg-green-600 transition">
+                            <h3 class="text-xl font-bold">Klient B2B</h3>
+                            <p class="mt-1 text-green-100">Zarządzaj produktami i sprzedażą.</p>
+                        </button>
+                    </div>
+                </div>
+            `,
             register: `
                 <div class="p-8">
                     <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">Stwórz nowe konto</h2>
@@ -249,27 +279,48 @@
                         <button id="nextButton" class="bg-brand-orange text-white font-bold py-3 px-8 rounded-lg hover:bg-opacity-90 transition-colors">Dalej</button>
                     </div>
                 </div>
+            `,
+            employeePanel: `
+                <span class="text-gray-700 font-medium">Witaj, <span id="welcome-name"></span>!</span>
+                <a href="#" class="text-sm text-gray-600 hover:brand-orange">Mój Profil</a>
+                <a href="#" class="text-sm text-gray-600 hover:brand-orange">Zapisane Oferty</a>
+                <a href="#" class="text-sm text-gray-600 hover:brand-orange">Moje Aplikacje</a>
+                <a href="#" id="logout-btn" class="bg-gray-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-700 transition">Wyloguj</a>
+            `,
+            sellerPanel: `
+                <span class="text-gray-700 font-medium">Panel Sprzedawcy: <span id="welcome-name"></span></span>
+                <a href="#" class="text-sm text-gray-600 hover:brand-orange">Moje Produkty</a>
+                <a href="#" class="text-sm text-gray-600 hover:brand-orange">Zamówienia</a>
+                <a href="#" class="text-sm text-gray-600 hover:brand-orange">Dodaj Produkt</a>
+                <a href="#" id="logout-btn" class="bg-gray-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-700 transition">Wyloguj</a>
             `
         };
 
         // --- LOGIKA APLIKACJI ---
-
+        
         function updateUI() {
             if (state.currentUser) {
                 loggedOutView.classList.add('hidden');
                 loggedInView.classList.remove('hidden');
                 loggedInView.classList.add('flex');
-                welcomeMessage.textContent = `Witaj, ${state.currentUser.name}!`;
+                if (state.currentUser.type === 'employee') {
+                    loggedInView.innerHTML = views.employeePanel;
+                } else {
+                    loggedInView.innerHTML = views.sellerPanel;
+                }
+                document.getElementById('welcome-name').textContent = state.currentUser.name;
+                document.getElementById('logout-btn').addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+
             } else {
                 loggedOutView.classList.remove('hidden');
                 loggedInView.classList.add('hidden');
             }
         }
 
-        function openModal(viewName) {
+        function openModal(viewName, options = {}) {
             modalContainer.innerHTML = views[viewName];
             modalOverlay.classList.add('visible');
-            attachModalListeners(viewName);
+            attachModalListeners(viewName, options);
             if (viewName === 'personalityTest') {
                 initPersonalityTest();
             }
@@ -279,16 +330,22 @@
             modalOverlay.classList.remove('visible');
         }
 
-        function attachModalListeners(viewName) {
+        function attachModalListeners(viewName, options) {
+            if (viewName === 'loginChoice') {
+                document.querySelectorAll('.login-choice-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        openModal('login', { type: btn.dataset.type });
+                    });
+                });
+            }
+            
             const showLogin = document.getElementById('show-login');
             const showRegister = document.getElementById('show-register');
-            if (showLogin) showLogin.addEventListener('click', (e) => { e.preventDefault(); openModal('login'); });
+            if (showLogin) showLogin.addEventListener('click', (e) => { e.preventDefault(); openModal('loginChoice'); });
             if (showRegister) showRegister.addEventListener('click', (e) => { e.preventDefault(); openModal('register'); });
 
             if (viewName === 'register') {
-                const registerForm = document.getElementById('register-form');
-                registerForm.addEventListener('submit', handleRegister);
-                
+                document.getElementById('register-form').addEventListener('submit', handleRegister);
                 const accountTypeBtns = document.querySelectorAll('.account-type-btn');
                 accountTypeBtns.forEach(btn => {
                     btn.addEventListener('click', () => {
@@ -300,7 +357,7 @@
             }
 
             if (viewName === 'login') {
-                document.getElementById('login-form').addEventListener('submit', handleLogin);
+                document.getElementById('login-form').addEventListener('submit', (e) => handleLogin(e, options.type));
             }
         }
         
@@ -319,9 +376,10 @@
             }
         }
 
-        function handleLogin(e) {
+        function handleLogin(e, type) {
             e.preventDefault();
-            state.currentUser = { name: 'Jan Kowalski', type: 'employee' };
+            const name = type === 'employee' ? 'Jan Pracownik' : 'Firma B2B';
+            state.currentUser = { name, type };
             updateUI();
             closeModal();
         }
@@ -336,63 +394,25 @@
             pageTitle.textContent = document.querySelector(`nav a[data-category="${categoryKey}"]`).textContent;
             contentContainer.innerHTML = ''; // Wyczyść kontener
 
-            const complexCategories = ['czesci-samochodowe', 'artykuly-spozywcze', 'alkohol'];
-            if (complexCategories.includes(categoryKey)) {
-                renderComplexPage(categoryKey);
+            if (categoryKey === 'czesci-samochodowe') {
+                renderCarPartsPage();
             } else {
-                renderStandardPage(categoryKey);
+                renderComplexPage(categoryKey);
             }
         }
-
-        function renderStandardPage(categoryKey) {
-            const isJobCategory = categoryKey === 'oferty-pracy';
-            const items = db[categoryKey] || [];
-            
-            contentContainer.className = isJobCategory ? 'grid grid-cols-1 gap-5' : 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5';
-
-            items.forEach(item => {
-                const card = document.createElement('article');
-                if (isJobCategory) {
-                    card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow duration-300';
-                    card.innerHTML = `
-                        <div class="p-5 flex-grow">
-                            <h3 class="text-xl font-bold text-gray-900">${item.name}</h3>
-                            <p class="font-semibold text-gray-600 mt-1">${item.seller}</p>
-                            <p class="text-sm text-gray-500 mt-1">${item.location}</p>
-                            <p class="text-gray-700 mt-3 text-sm">${item.description}</p>
-                        </div>
-                        <div class="p-5 bg-gray-50 flex flex-col justify-center items-center sm:items-end border-t sm:border-t-0 sm:border-l border-gray-200">
-                             <p class="text-lg font-bold brand-orange">${item.price}</p>
-                             <button class="mt-3 bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition w-full sm:w-auto">Aplikuj</button>
-                        </div>
-                    `;
-                } else {
-                    card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300';
-                    card.innerHTML = `
-                        <img src="${item.image || 'https://placehold.co/400x400/ccc/fff?text=Brak+zdjęcia'}" alt="Zdjęcie: ${item.name}" class="w-full h-48 object-cover">
-                        <div class="p-4 flex flex-col flex-grow">
-                            <h3 class="text-lg font-semibold text-gray-800 flex-grow">${item.name}</h3>
-                            <p class="text-sm text-gray-500 mt-1">Sprzedawca: ${item.seller}</p>
-                            <p class="text-xl font-bold text-gray-900 mt-2">${item.price}</p>
-                            <button class="mt-4 w-full bg-teal-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-600 transition">Dodaj do koszyka</button>
-                        </div>
-                    `;
-                }
-                contentContainer.appendChild(card);
-            });
-        }
-
+        
         function renderComplexPage(categoryKey) {
             contentContainer.className = 'space-y-12';
-            const products = db[categoryKey] || [];
-            const sellerIds = [...new Set(products.map(p => p.sellerId))];
+            const items = db[categoryKey] || [];
+            const sellerIds = [...new Set(items.map(p => p.sellerId))];
             const categorySellers = sellerIds.map(id => ({ id, ...db.sellers[id] })).filter(s => s.name);
+            const isJobCategory = ['oferty-pracy', 'cyberbezpieczenstwo'].includes(categoryKey);
 
             // Sekcja Sprzedawców
             const sellersSection = document.createElement('section');
             const sellersTitle = document.createElement('h3');
             sellersTitle.className = 'text-2xl font-bold text-gray-800 mb-4 border-b pb-2';
-            sellersTitle.textContent = 'Wyróżnieni Sprzedawcy';
+            sellersTitle.textContent = isJobCategory ? 'Wyróżnione Firmy / Agencje' : 'Wyróżnieni Sprzedawcy';
             sellersSection.appendChild(sellersTitle);
 
             const sellersGrid = document.createElement('div');
@@ -418,17 +438,176 @@
             sellersSection.appendChild(sellersGrid);
             contentContainer.appendChild(sellersSection);
 
+            // Sekcja Produktów / Ofert
+            const itemsSection = document.createElement('section');
+            const itemsTitle = document.createElement('h3');
+            itemsTitle.className = 'text-2xl font-bold text-gray-800 mb-4 border-b pb-2';
+            itemsTitle.textContent = isJobCategory ? 'Wszystkie Oferty' : 'Wszystkie Produkty';
+            itemsSection.appendChild(itemsTitle);
+
+            const itemsGrid = document.createElement('div');
+            itemsGrid.className = isJobCategory 
+                ? 'grid grid-cols-1 gap-5' 
+                : 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5';
+            
+            items.forEach(item => {
+                const card = document.createElement('article');
+                if (isJobCategory) {
+                    card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col sm:flex-row hover:shadow-xl transition-shadow duration-300';
+                    card.innerHTML = `
+                        <div class="p-5 flex-grow">
+                            <h3 class="text-xl font-bold text-gray-900">${item.name}</h3>
+                            <p class="font-semibold text-gray-600 mt-1">${db.sellers[item.sellerId].name}</p>
+                            <p class="text-sm text-gray-500 mt-1">${item.location}</p>
+                            <p class="text-gray-700 mt-3 text-sm">${item.description}</p>
+                        </div>
+                        <div class="p-5 bg-gray-50 flex flex-col justify-center items-center sm:items-end border-t sm:border-t-0 sm:border-l border-gray-200">
+                             <p class="text-lg font-bold brand-orange">${item.price}</p>
+                             <button class="mt-3 bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition w-full sm:w-auto">Aplikuj</button>
+                        </div>
+                    `;
+                } else {
+                    card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300';
+                    card.innerHTML = `
+                        <img src="${item.image || 'https://placehold.co/400x400/ccc/fff?text=Brak+zdjęcia'}" alt="Zdjęcie: ${item.name}" class="w-full h-48 object-cover">
+                        <div class="p-4 flex flex-col flex-grow">
+                            <h3 class="text-lg font-semibold text-gray-800 flex-grow">${item.name}</h3>
+                            <p class="text-sm text-gray-500 mt-1">Sprzedawca: ${db.sellers[item.sellerId].name}</p>
+                            <p class="text-xl font-bold text-gray-900 mt-2">${item.price}</p>
+                            <button class="mt-4 w-full bg-teal-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-600 transition">Dodaj do koszyka</button>
+                        </div>
+                    `;
+                }
+                itemsGrid.appendChild(card);
+            });
+            itemsSection.appendChild(itemsGrid);
+            contentContainer.appendChild(itemsSection);
+        }
+        
+        function renderCarPartsPage() {
+            contentContainer.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Znajdź części do swojego pojazdu</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <select class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400">
+                            <option>Wybierz markę</option>
+                            <option>Volkswagen</option>
+                            <option>BMW</option>
+                            <option>Audi</option>
+                        </select>
+                        <select class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400">
+                            <option>Wybierz model</option>
+                        </select>
+                        <select class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400">
+                            <option>Wybierz rocznik</option>
+                        </select>
+                        <button class="w-full bg-brand-orange text-white font-bold rounded-md hover:bg-opacity-90">Szukaj</button>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row gap-8">
+                    <aside class="w-full md:w-1/4">
+                        <div id="filters-container" class="space-y-6"></div>
+                    </aside>
+                    <div class="w-full md:w-3/4" id="car-parts-content"></div>
+                </div>
+            `;
+
+            const carPartsContent = document.getElementById('car-parts-content');
+            const filtersContainer = document.getElementById('filters-container');
+
+            // Renderowanie filtrów
+            const subCategories = [...new Set(db['czesci-samochodowe'].map(p => p.subCategory))];
+            const manufacturers = [...new Set(db['czesci-samochodowe'].map(p => p.manufacturer))];
+            const conditions = [...new Set(db['czesci-samochodowe'].map(p => p.condition))];
+
+            const createFilterSection = (title, items, filterKey) => {
+                const links = items.map(item => `<a href="#" class="block text-gray-700 hover:brand-orange py-1" data-filter="${filterKey}" data-value="${item}">${item}</a>`).join('');
+                return `
+                    <div>
+                        <h4 class="font-bold text-lg mb-2 border-b pb-1">${title}</h4>
+                        <div class="space-y-1">${links}</div>
+                    </div>
+                `;
+            };
+            
+            filtersContainer.innerHTML = `
+                ${createFilterSection('Podkategorie', subCategories, 'subCategory')}
+                ${createFilterSection('Producenci', manufacturers, 'manufacturer')}
+                ${createFilterSection('Stan', conditions, 'condition')}
+            `;
+
+            // Renderowanie sprzedawców i produktów
+            renderCarPartsSellersAndProducts(carPartsContent, {});
+
+            // Dodanie obsługi kliknięć na filtry i sprzedawców
+            contentContainer.addEventListener('click', (e) => {
+                if (e.target.matches('[data-filter]')) {
+                    e.preventDefault();
+                    // Logika filtrowania produktów - do zaimplementowania
+                    alert(`Filtrowanie po: ${e.target.dataset.filter} = ${e.target.dataset.value}`);
+                }
+                if (e.target.closest('[data-seller-id]')) {
+                    e.preventDefault();
+                    const sellerId = e.target.closest('[data-seller-id]').dataset.sellerId;
+                    renderCarPartsSellersAndProducts(carPartsContent, { sellerId: sellerId });
+                }
+            });
+        }
+
+        function renderCarPartsSellersAndProducts(container, filters) {
+             container.innerHTML = ''; // Wyczyść kontener przed renderowaniem
+            const items = db['czesci-samochodowe'] || [];
+            const sellerIds = [...new Set(items.map(p => p.sellerId))];
+            const categorySellers = sellerIds.map(id => ({ id, ...db.sellers[id] })).filter(s => s.name);
+
+            // Sekcja Sprzedawców
+            const sellersSection = document.createElement('section');
+            const sellersTitle = document.createElement('h3');
+            sellersTitle.className = 'text-2xl font-bold text-gray-800 mb-4';
+            sellersTitle.textContent = 'Wyróżnieni Sprzedawcy';
+            sellersSection.appendChild(sellersTitle);
+
+            const sellersGrid = document.createElement('div');
+            sellersGrid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6';
+            
+            categorySellers.forEach(seller => {
+                const isSuperSeller = seller.rating >= 4.8;
+                const sellerCard = document.createElement('a');
+                sellerCard.href = '#';
+                sellerCard.dataset.sellerId = seller.id;
+                sellerCard.className = 'bg-white p-4 rounded-lg shadow-md flex items-center space-x-4 hover:shadow-lg transition-shadow hover:ring-2 hover:ring-orange-400';
+                sellerCard.innerHTML = `
+                    <img src="${seller.image}" alt="Logo ${seller.name}" class="w-16 h-16 rounded-full border-2 border-gray-200 pointer-events-none">
+                    <div class="flex-grow pointer-events-none">
+                        <h4 class="font-bold text-lg text-gray-900">${seller.name}</h4>
+                        <div class="flex items-center mt-1">
+                             <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                             <span class="text-gray-600 text-sm font-semibold ml-1">${seller.rating}</span>
+                        </div>
+                    </div>
+                    ${isSuperSeller ? `<div class="ml-auto pointer-events-none"><span class="bg-yellow-400 text-yellow-900 text-xs font-bold px-2.5 py-1 rounded-full">Super Sprzedawca</span></div>` : ''}
+                `;
+                sellersGrid.appendChild(sellerCard);
+            });
+            sellersSection.appendChild(sellersGrid);
+            container.appendChild(sellersSection);
+
             // Sekcja Produktów
             const productsSection = document.createElement('section');
+            productsSection.className = "mt-12";
             const productsTitle = document.createElement('h3');
-            productsTitle.className = 'text-2xl font-bold text-gray-800 mb-4 border-b pb-2';
-            productsTitle.textContent = 'Wszystkie Produkty';
+            productsTitle.className = 'text-2xl font-bold text-gray-800 mb-4';
+            productsTitle.textContent = filters.sellerId ? `Produkty od ${db.sellers[filters.sellerId].name}` : 'Wszystkie Produkty';
             productsSection.appendChild(productsTitle);
 
             const productsGrid = document.createElement('div');
-            productsGrid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5';
+            productsGrid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5';
             
-            products.forEach(item => {
+            const filteredItems = items.filter(item => {
+                return !filters.sellerId || item.sellerId === filters.sellerId;
+            });
+
+            filteredItems.forEach(item => {
                 const card = document.createElement('article');
                 card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300';
                 card.innerHTML = `
@@ -443,8 +622,9 @@
                 productsGrid.appendChild(card);
             });
             productsSection.appendChild(productsGrid);
-            contentContainer.appendChild(productsSection);
+            container.appendChild(productsSection);
         }
+
 
         // --- LOGIKA TESTU PREDYSPOZYCJI ---
         function initPersonalityTest() {
@@ -521,8 +701,7 @@
 
         // --- INICJALIZACJA ---
         document.getElementById('register-btn').addEventListener('click', (e) => { e.preventDefault(); openModal('register'); });
-        document.getElementById('login-btn').addEventListener('click', (e) => { e.preventDefault(); openModal('login'); });
-        document.getElementById('logout-btn').addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+        document.getElementById('login-btn').addEventListener('click', (e) => { e.preventDefault(); openModal('loginChoice'); });
         modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
 
         navLinks.forEach(link => {
@@ -534,7 +713,8 @@
             });
         });
 
-        // Domyślne wyświetlenie pierwszej kategorii
+        // Domyślne ustawienia
+        updateUI();
         if (navLinks.length > 0) {
             navLinks[0].click();
         }
